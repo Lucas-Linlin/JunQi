@@ -2,6 +2,10 @@
 JunQi game
 '''
 import pygame
+from pathlib import Path
+
+ROOT_PATH = Path(__file__)
+IMAGES_PATH = ROOT_PATH / '..' / 'images'
 
 CHESS_LEVEL: dict[int, str] = {
     0: '工兵',
@@ -19,10 +23,34 @@ CHESS_LEVEL: dict[int, str] = {
 }
 
 
+class ChessError(Exception):
+    pass
+
+
 class Chess(pygame.sprite.Sprite):
-    def __init__(self, level: int, team:str):
+    def __init__(self, level: int, team: str):
         self.level: int = level
-        self.image = pygame.image.load(f'{team}-{level}.png')
+        self.image = pygame.image.load(IMAGES_PATH / f'{team}_{level}.png')
+
+    def __gt__(self, other):
+        if not isinstance(other, Chess):
+            raise TypeError
+        
+        if self.level == 10:
+            return False
+        
+        elif self.level == 0 and other.level == 9:
+            return True
+        
+        else:
+            return self.level > other.level
+
+    def __eq__(self, other):
+        if not isinstance(other, Chess):
+            raise TypeError
+        
+        return self.level == other.level or self.level == 10
+
 
 def main():
     pygame.init()
@@ -38,5 +66,16 @@ def main():
     pygame.quit()
 
 
+def test():
+    a = int(input('A >>> '))
+    b = int(input('B >>> '))
+
+    print('A > B: ', Chess(a, 'R') > Chess(b, 'B'))
+
+    print('A == B: ', Chess(a, 'R') == Chess(b, 'B'))
+
+
 if __name__ == "__main__":
-    main()
+    # main()
+    while True:
+        test()
